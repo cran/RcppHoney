@@ -1,3 +1,5 @@
+// [[Rcpp::depends(RcppHoney)]]
+
 #include <RcppHoney.hpp>
 
 // [[Rcpp::export]]
@@ -46,7 +48,7 @@ Rcpp::NumericVector test_hooked_plus_operand(Rcpp::NumericVector v1, std::vector
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericVector test_operand_plus_operand(double s, std::vector< int > v1, std::vector< int > v2) {
+Rcpp::NumericVector test_operand_plus_operand(std::vector< int > v1, std::vector< int > v2) {
     return Rcpp::wrap((v1 + v2) + (v1 + v2));
 }
 
@@ -68,4 +70,58 @@ Rcpp::NumericVector test_unary_function_hooked(std::vector< int > v) {
 // [[Rcpp::export]]
 Rcpp::NumericVector test_unary_function_operand(std::vector< int > v) {
     return Rcpp::wrap(RcppHoney::log(v + v));
+}
+
+
+
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_hooked_scalar(std::vector< int > v1, double s) {
+    return Rcpp::wrap(RcppHoney::pow(v1, s));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_scalar_hooked(double s, std::vector< int > v1) {
+    return Rcpp::wrap(RcppHoney::pow(s, v1));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_hooked_hooked(std::vector< int > v1, std::vector< int > v2) {
+    return Rcpp::wrap(RcppHoney::pow(v1, v2));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_hooked_other_hooked(std::vector< int > v1, Rcpp::NumericVector v2) {
+    return Rcpp::wrap(RcppHoney::pow(v1, v2));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_other_hooked_hooked(Rcpp::NumericVector v1, std::vector< int > v2) {
+    return Rcpp::wrap(RcppHoney::pow(v1, v2));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_operand_scalar(std::vector< int > v1, std::vector< int > v2, double s) {
+    return Rcpp::wrap(RcppHoney::pow(v1 + v2, s));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_scalar_operand(double s, std::vector< int > v1, std::vector< int > v2) {
+    return Rcpp::wrap(RcppHoney::pow(s, v1 + v2));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_operand_hooked(std::vector< int > v1, std::vector< int > v2, Rcpp::NumericVector v3) {
+    return Rcpp::wrap(RcppHoney::pow(v1 + v2, v3));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_hooked_operand(Rcpp::NumericVector v1, std::vector< int > v2, std::vector< int > v3) {
+    return Rcpp::wrap(RcppHoney::pow(v1, v2 + v3));
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector test_binary_function_operand_operand(std::vector< int > v1, std::vector< int > v2) {
+    return Rcpp::wrap(RcppHoney::pow(v1 + v2, v2 + v2));
 }
