@@ -17,21 +17,14 @@
 
 #pragma once
 
-#include <algorithm>
-#include "../RcppHoneyForward.hpp"
+#include <exception>
 
-namespace Rcpp {
-namespace traits {
-
-template< typename T, typename T_ITER, typename T_RESULT > SEXP wrap(
-    const RcppHoney::operand< T, T_ITER, T_RESULT > &obj) {
-
-    const int RTYPE = Rcpp::traits::r_sexptype_traits< T_RESULT >::rtype;
-    Shield< SEXP > x( Rf_allocVector(RTYPE, obj.end() - obj.begin()));
-    std::transform(obj.begin(), obj.end(), internal::r_vector_start< RTYPE >(x),
-        internal::caster< T, T_RESULT >);
-    return x;
-}
-
-} // namespace traits
-} // namespace Rcpp
+namespace RcppHoney {
+    
+class bounds_exception : public std::exception {
+    virtual const char *what() const throw() {
+        return "operand size mismatch";
+    }
+};
+    
+} // namespace RcppHoney
