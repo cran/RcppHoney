@@ -15,8 +15,18 @@
 
 # Interrogate R for what linkers it will use when compiling C/C++ code.
 
-SHLIB_LD=`R CMD config SHLIB_LD`
-SHLIB_CXXLD=`R CMD config SHLIB_CXXLD`
+
+if [ -z $R_HOME ]; then
+    R_HOME=${R RHOME}
+fi
+
+if [ "$R_HOME" == "" ]; then
+    echo "Could not find R_HOME."
+    exit 1
+fi
+
+SHLIB_LD=`$R_HOME/bin/R CMD config SHLIB_LD`
+SHLIB_CXXLD=`$R_HOME/bin/R CMD config SHLIB_CXXLD`
 
 # First run the commands defined by SHLIB_LD and SHLIB_CXXLD with --version
 # to get a description string.  If the string implies that this is a gcc
@@ -27,22 +37,40 @@ SHLIB_CXXLD_RESULTS=0
 
 if [ "$SHLIB_LD" != "" ]; then
     OUTPUT=`$SHLIB_LD --version`
+    LD_PROG=""
     
     case "$OUTPUT" in
-        *gcc*) SHLIB_LD_RESULTS=1 ;;
-        *g++*) SHLIB_LD_RESULTS=1 ;;
-        *clang*) SHLIB_LD_RESULTS=1 ;;
+        *gcc*) LD_PROG=`$SHLIB_LD --print-prog-name=ld` ;;
+        *g++*) LD_PROG=`$SHLIB_LD --print-prog-name=ld` ;;
+        *clang*) LD_PROG=`$SHLIB_LD --print-prog-name=ld` ;;
     esac
+    
+    if [ "$LD_PROG" != "" ]; then
+        OUTPUT=`$LD_PROG --version`
+        case "$OUTPUT" in
+            GNU?ld*) SHLIB_LD_RESULTS=1 ;;
+            GNU?gold*) SHLIB_LD_RESULTS=1 ;;
+        esac
+    fi
 fi
 
 if [ "$SHLIB_CXXLD" != "" ]; then
     OUTPUT=`$SHLIB_CXXLD --version`
+    LD_PROG=""
     
     case "$OUTPUT" in
-        *gcc*) SHLIB_CXXLD_RESULTS=1 ;;
-        *g++*) SHLIB_CXXLD_RESULTS=1 ;;
-        *clang*) SHLIB_CXXLD_RESULTS=1 ;;
+        *gcc*) LD_PROG=`$SHLIB_CXXLD --print-prog-name=ld` ;;
+        *g++*) LD_PROG=`$SHLIB_CXXLD --print-prog-name=ld` ;;
+        *clang*) LD_PROG=`$SHLIB_CXXLD --print-prog-name=ld` ;;
     esac
+    
+    if [ "$LD_PROG" != "" ]; then
+        OUTPUT=`$LD_PROG --version`
+        case "$OUTPUT" in
+            GNU?ld*) SHLIB_CXXLD_RESULTS=1 ;;
+            GNU?gold*) SHLIB_CXXLD_RESULTS=1 ;;
+        esac
+    fi
 fi
 
 # Clean up any temporary files we created previously
@@ -94,23 +122,6 @@ if [ $SHLIB_LD_RESULTS -eq 1 ] && [ $SHLIB_CXXLD_RESULTS -eq 1 ]; then
     if [ $FOUND_PKG_LIBS_ASSIGNMENT -eq 0 ]; then
         echo "PKG_LIBS = \$(R_STRIP_LINKER_OPTION)" \
             >> src/Makevars.R_STRIP_LINKER_OPTION
-    fi
-else
-    # We don't have a linker that we can tell to strip the debugging symbols
-    # so simply remove any previous assignment to R_STRIP_LINKER_OPTION.
-    # When we're done we'll add a line defining it as empty string (in case
-    # there are references to it elsewhere)
-    
-    if [ -f src/Makevars ]; then
-        while read -r LINE || [ -n "$LINE" ]; do
-            case "$LINE" in
-                *PKG_LIBS*=*R_STRIP_LINKER_OPTION*)
-                    LINE=${LINE% \$(R_STRIP_LINKER_OPTION)}
-                    echo $LINE >> src/Makevars.R_STRIP_LINKER_OPTION ;;
-                *R_STRIP_LINKER_OPTION=*) ;;
-                *) echo $LINE >> src/Makevars.R_STRIP_LINKER_OPTION ;;
-            esac
-        done <src/Makevars
     fi
 fi
 

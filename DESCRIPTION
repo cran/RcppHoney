@@ -2,7 +2,7 @@ Package: RcppHoney
 Type: Package
 Title: Iterator Based Expression Template Expansion of Standard
         Operators
-Version: 0.1.2
+Version: 0.1.4
 Author: Daniel C. Dillon
 Maintainer: Daniel C. Dillon <dcdillon@gmail.com>
 URL: https://github.com/dcdillon/RcppHoney
@@ -16,6 +16,6 @@ Imports: Rcpp (>= 0.12.8)
 Suggests: RUnit, knitr, rmarkdown
 LinkingTo: Rcpp
 NeedsCompilation: yes
-Packaged: 2016-11-26 19:55:40 UTC; dcdillon
+Packaged: 2016-11-29 03:18:14 UTC; dcdillon
 Repository: CRAN
-Date/Publication: 2016-11-26 23:32:14
+Date/Publication: 2016-11-30 09:10:51
