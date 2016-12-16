@@ -109,6 +109,8 @@ test.na.binary.function.operand.and.operand <- function() {
 
 test.unary.functions <- function() {
     v <- c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1)
+    m <- matrix(v, 5, 2)
+    
     checkEquals(log(v), test_log(v))
     checkEquals(exp(v), test_exp(v))
     checkEquals(sqrt(v), test_sqrt(v))
@@ -135,6 +137,18 @@ test.unary.functions <- function() {
     checkEquals(lfactorial(v), test_lfactorial(v))
     checkEquals(trunc(v), test_trunc(v))
     checkEquals(diff(v), test_diff(v))
+    checkEquals(cumsum(v), test_cumsum(v))
+    checkEquals(cumsum(m), test_cumsum_matrix(m))
+    checkEquals(cumsum(log(m)), test_cumsum_operand(m))
+    checkEquals(cumprod(v), test_cumprod(v))
+    checkEquals(cumprod(m), test_cumprod_matrix(m))
+    checkEquals(cumprod(log(m)), test_cumprod_operand(m))
+    checkEquals(cummin(v), test_cummin(v))
+    checkEquals(cummin(m), test_cummin_matrix(m))
+    checkEquals(cummin(log(m)), test_cummin_operand(m))
+    checkEquals(cummax(v), test_cummax(v))
+    checkEquals(cummax(m), test_cummax_matrix(m))
+    checkEquals(cummax(log(m)), test_cummax_operand(m))
 }
 
 test.binary.functions <- function() {
@@ -191,4 +205,21 @@ test.na.binary.functions <- function() {
     checkEquals(psigamma(v1, v2), test_psigamma(v1, v2))
     checkEquals(round(v1, v2), test_round(v1, v2))
     checkEquals(signif(v1, v2), test_signif(v1, v2))
+}
+
+test.cbind <- function() {
+    v1 <- 1:10
+    v2 <- 11:20
+    
+    v3 <- 100:101
+    
+    m1 <- matrix(1:10, 2, 5)
+    m2 <- matrix(11:20, 2, 5)
+    
+    checkEquals(unname(cbind(1, v2)), test_cbind_scalar_vector(1, v2))
+    checkEquals(unname(cbind(v1, 1)), test_cbind_vector_scalar(v1, 1))
+    checkEquals(unname(cbind(v1, v2)), test_cbind_vector_vector(v1, v2))
+    checkEquals(unname(cbind(m1, v3)), test_cbind_matrix_vector(m1, v3))
+    checkEquals(unname(cbind(v3, m1)), test_cbind_vector_matrix(v3, m1))
+    checkEquals(unname(cbind(m1, m2)), test_cbind_matrix_matrix(m1, m2))
 }

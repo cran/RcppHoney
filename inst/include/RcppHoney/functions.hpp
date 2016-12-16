@@ -213,6 +213,106 @@ _FNAME_ (const T &lhs, const U &rhs) {                                          
         >());                                                                                                          \
 }
 
+#define RCPP_HONEY_GENERATE_BINARY_OPERAND(_FNAME_, _OPERAND_TYPE_)                                                    \
+template< typename T, typename T_ITER, typename T_RESULT, typename U, typename U_ITER, typename U_RESULT >             \
+RcppHoney::_OPERAND_TYPE_< T_ITER, U_ITER, (T::NA || U::NA) >                                                          \
+_FNAME_ (const RcppHoney::operand< T, T_ITER, T_RESULT > &lhs,                                                         \
+    const RcppHoney::operand< U, U_ITER, U_RESULT > &rhs) {                                                            \
+                                                                                                                       \
+    return RcppHoney::make_##_OPERAND_TYPE_< (T::NA || U::NA) >()(lhs, rhs);                                           \
+}                                                                                                                      \
+                                                                                                                       \
+template< typename T, typename T_ITER, typename T_RESULT, typename U >                                                 \
+typename RcppHoney::traits::enable_if< RcppHoney::traits::is_primitive< U >::value,                                    \
+    RcppHoney::_OPERAND_TYPE_< T_ITER, typename RcppHoney::scalar_operator< U >::const_iterator, T::NA >               \
+    >::type                                                                                                            \
+_FNAME_ (const RcppHoney::operand< T, T_ITER, T_RESULT > &lhs, const U &rhs) {                                         \
+    return RcppHoney::make_##_OPERAND_TYPE_< T::NA >()(lhs, RcppHoney::make_scalar_operator()(rhs));                    \
+}                                                                                                                      \
+                                                                                                                       \
+template< typename T, typename U, typename U_ITER, typename U_RESULT >                                                 \
+typename RcppHoney::traits::enable_if< RcppHoney::traits::is_primitive< T >::value,                                    \
+    RcppHoney::_OPERAND_TYPE_< typename RcppHoney::scalar_operator< T >::const_iterator, U_ITER, U::NA >                \
+    >::type                                                                                                            \
+_FNAME_ (const T &lhs, const RcppHoney::operand< U, U_ITER, U_RESULT > &rhs) {                                         \
+    return RcppHoney::make_##_OPERAND_TYPE_< U::NA >()(RcppHoney::make_scalar_operator()(lhs), rhs);                   \
+}                                                                                                                      \
+                                                                                                                       \
+template< typename T, typename U >                                                                                     \
+typename RcppHoney::traits::enable_if<                                                                                 \
+    (RcppHoney::hook< T >::value && RcppHoney::hook< U >::value),                                                      \
+    RcppHoney::_OPERAND_TYPE_<                                                                                          \
+        typename RcppHoney::hook< T >::const_iterator,                                                                 \
+        typename RcppHoney::hook< U >::const_iterator,                                                                 \
+        (RcppHoney::hook< T >::NA || RcppHoney::hook< U >::NA)                                                         \
+    >                                                                                                                  \
+>::type                                                                                                                \
+_FNAME_ (const T &lhs, const U &rhs) {                                                                                 \
+    return RcppHoney::make_##_OPERAND_TYPE_< (RcppHoney::hook< T >::NA || RcppHoney::hook< U >::NA) >()(               \
+        lhs,                                                                                                           \
+        rhs);                                                                                                          \
+}                                                                                                                      \
+                                                                                                                       \
+template< typename T, typename T_ITER, typename T_RESULT, typename U >                                                 \
+typename RcppHoney::traits::enable_if< RcppHoney::hook< U >::value,                                                    \
+    RcppHoney::_OPERAND_TYPE_<                                                                                         \
+        T_ITER,                                                                                                        \
+        typename RcppHoney::hook< U >::const_iterator,                                                                 \
+        (T::NA || RcppHoney::hook< U >::NA)                                                                            \
+    >                                                                                                                  \
+>::type                                                                                                                \
+_FNAME_ (const RcppHoney::operand< T, T_ITER, T_RESULT > &lhs, const U &rhs) {                                         \
+    return RcppHoney::make_##_OPERAND_TYPE_< (T::NA || RcppHoney::hook< U >::NA) >()(                                  \
+        lhs,                                                                                                           \
+        rhs);                                                                                                          \
+}                                                                                                                      \
+                                                                                                                       \
+template< typename T, typename U, typename U_ITER, typename U_RESULT >                                                 \
+typename RcppHoney::traits::enable_if< RcppHoney::hook< T >::value,                                                    \
+    RcppHoney::_OPERAND_TYPE_<                                                                                         \
+        typename RcppHoney::hook< T >::const_iterator,                                                                 \
+        U_ITER,                                                                                                        \
+        (U::NA || RcppHoney::hook< T >::NA)                                                                            \
+    >                                                                                                                  \
+>::type                                                                                                                \
+_FNAME_ (const T &lhs, const RcppHoney::operand< U, U_ITER, U_RESULT > &rhs) {                                         \
+    return RcppHoney::make_##_OPERAND_TYPE_< (U::NA || RcppHoney::hook< T >::NA) >()(                                  \
+        lhs,                                                                                                           \
+        rhs);                                                                                                          \
+}                                                                                                                      \
+                                                                                                                       \
+template< typename T, typename U >                                                                                     \
+typename RcppHoney::traits::enable_if<                                                                                 \
+    RcppHoney::traits::is_primitive< T >::value                                                                        \
+    && RcppHoney::hook< U >::value,                                                                                    \
+    RcppHoney::_OPERAND_TYPE_<                                                                                         \
+        typename RcppHoney::scalar_operator< T >::const_iterator,                                                      \
+        typename RcppHoney::hook< U >::const_iterator,                                                                 \
+        RcppHoney::hook< U >::NA                                                                                       \
+    >                                                                                                                  \
+>::type                                                                                                                \
+_FNAME_ (const T &lhs, const U &rhs) {                                                                                 \
+    return RcppHoney::make_##_OPERAND_TYPE_< RcppHoney::hook< U >::NA >()(                                              \
+        RcppHoney::make_scalar_operator()(lhs),                                                                        \
+        rhs);                                                                                                          \
+}                                                                                                                      \
+                                                                                                                       \
+template< typename T, typename U >                                                                                     \
+typename RcppHoney::traits::enable_if<                                                                                 \
+    RcppHoney::traits::is_primitive< U >::value                                                                        \
+    && RcppHoney::hook< T >::value,                                                                                    \
+    RcppHoney::_OPERAND_TYPE_<                                                                                         \
+        typename RcppHoney::hook< T >::const_iterator,                                                                 \
+        typename RcppHoney::scalar_operator< U >::const_iterator,                                                      \
+        RcppHoney::hook< T >::NA                                                                                       \
+    >                                                                                                                  \
+>::type                                                                                                                \
+_FNAME_ (const T &lhs, const U &rhs) {                                                                                 \
+    return RcppHoney::make_##_OPERAND_TYPE_< RcppHoney::hook< T >::NA >()(                                             \
+        lhs,                                                                                                           \
+        RcppHoney::make_scalar_operator()(rhs));                                                                       \
+}
+
 RCPP_HONEY_GENERATE_UNARY_FUNCTION(log, log)
 RCPP_HONEY_GENERATE_UNARY_FUNCTION(exp, exp)
 RCPP_HONEY_GENERATE_UNARY_FUNCTION(sqrt, sqrt)
@@ -300,5 +400,387 @@ diff(const T &rhs) {
     >(begin, rhs.end(), dims,
         functors::diff< typename hook< T >::const_iterator, hook< T >::NA >());
 }
+
+template< typename T, typename T_ITER, typename T_RESULT >
+Rcpp::Vector< rtype< T_RESULT >::value > cumsum(
+    const operand< T, T_ITER, T_RESULT > &val) {
+
+    T_RESULT previous = 0;
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    typename Rcpp::Vector< rtype< T_RESULT >::value > vec(size);
+    
+    typename operand< T, T_ITER, T_RESULT >::const_iterator i = val.begin();
+    typename operand< T, T_ITER, T_RESULT >::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< T_RESULT >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const T_RESULT value = *i;
+        
+        if (na< typename traits::ctype< T_RESULT >::type >::is_na(value)
+            || na< typename traits::ctype< T_RESULT >::type >::is_na(
+                previous)) {
+            previous = na< T_RESULT >::VALUE();
+        } else {
+            previous += value;
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
+template< typename T, typename T_ITER, typename T_RESULT >
+Rcpp::Vector< rtype< T_RESULT >::value > cumprod(
+    const operand< T, T_ITER, T_RESULT > &val) {
+
+    T_RESULT previous = 1;
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    typename Rcpp::Vector< rtype< T_RESULT >::value > vec(size);
+    
+    typename operand< T, T_ITER, T_RESULT >::const_iterator i = val.begin();
+    typename operand< T, T_ITER, T_RESULT >::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< T_RESULT >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const T_RESULT value = *i;
+        
+        if (na< typename traits::ctype< T_RESULT >::type >::is_na(value)
+            || na< typename traits::ctype< T_RESULT >::type >::is_na(
+                previous)) {
+            previous = na< T_RESULT >::VALUE();
+        } else {
+            previous *= value;
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
+template< typename T, typename T_ITER, typename T_RESULT >
+Rcpp::Vector< rtype< T_RESULT >::value > cummin(
+    const operand< T, T_ITER, T_RESULT > &val) {
+
+    T_RESULT previous = std::numeric_limits< T_RESULT >::max();
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    typename Rcpp::Vector< rtype< T_RESULT >::value > vec(size);
+    
+    typename operand< T, T_ITER, T_RESULT >::const_iterator i = val.begin();
+    typename operand< T, T_ITER, T_RESULT >::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< T_RESULT >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const T_RESULT value = *i;
+        
+        if (na< typename traits::ctype< T_RESULT >::type >::is_na(value)
+            || na< typename traits::ctype< T_RESULT >::type >::is_na(
+                previous)) {
+            previous = na< T_RESULT >::VALUE();
+        } else {
+            previous = std::min(previous, value);
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
+template< typename T, typename T_ITER, typename T_RESULT >
+Rcpp::Vector< rtype< T_RESULT >::value > cummax(
+    const operand< T, T_ITER, T_RESULT > &val) {
+
+    T_RESULT previous;
+    
+    if (std::numeric_limits< T_RESULT >::is_integer) {
+        previous = std::numeric_limits< T_RESULT >::min() + 1;
+    } else {
+        previous = -std::numeric_limits< T_RESULT >::max();
+    }
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    typename Rcpp::Vector< rtype< T_RESULT >::value > vec(size);
+    
+    typename operand< T, T_ITER, T_RESULT >::const_iterator i = val.begin();
+    typename operand< T, T_ITER, T_RESULT >::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< T_RESULT >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const T_RESULT value = *i;
+        
+        if (na< typename traits::ctype< T_RESULT >::type >::is_na(value)
+            || na< typename traits::ctype< T_RESULT >::type >::is_na(
+                previous)) {
+            previous = na< T_RESULT >::VALUE();
+        } else {
+            previous = std::max(previous, value);
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
+
+template< typename T >
+typename traits::enable_if<
+    hook< T >::value,
+    Rcpp::Vector<
+        rtype<
+            typename traits::ctype<
+                typename std::iterator_traits< typename T::iterator >::value_type
+             >::type
+        >::value
+    >
+>::type cumsum(const T &val) {
+
+    typedef typename traits::ctype<
+        typename std::iterator_traits< typename T::iterator >::value_type
+     >::type result_type;
+     
+    result_type previous = 0;
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    Rcpp::Vector< rtype< result_type >::value > vec(size);
+    
+    typename T::const_iterator i = val.begin();
+    typename T::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< result_type >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const result_type value = *i;
+        
+        if (na< typename traits::ctype< result_type >::type >::is_na(value)
+            || na< typename traits::ctype< result_type >::type >::is_na(
+                previous)) {
+            previous = na< result_type >::VALUE();
+        } else {
+            previous += value;
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
+template< typename T >
+typename traits::enable_if<
+    hook< T >::value,
+    Rcpp::Vector<
+        rtype<
+            typename traits::ctype<
+                typename std::iterator_traits< typename T::iterator >::value_type
+             >::type
+        >::value
+    >
+>::type cumprod(const T &val) {
+
+    typedef typename traits::ctype<
+        typename std::iterator_traits< typename T::iterator >::value_type
+     >::type result_type;
+     
+    result_type previous = 1;
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    Rcpp::Vector< rtype< result_type >::value > vec(size);
+    
+    typename T::const_iterator i = val.begin();
+    typename T::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< result_type >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const result_type value = *i;
+        
+        if (na< typename traits::ctype< result_type >::type >::is_na(value)
+            || na< typename traits::ctype< result_type >::type >::is_na(
+                previous)) {
+            previous = na< result_type >::VALUE();
+        } else {
+            previous *= value;
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
+template< typename T >
+typename traits::enable_if<
+    hook< T >::value,
+    Rcpp::Vector<
+        rtype<
+            typename traits::ctype<
+                typename std::iterator_traits< typename T::iterator >::value_type
+             >::type
+        >::value
+    >
+>::type cummin(const T &val) {
+
+    typedef typename traits::ctype<
+        typename std::iterator_traits< typename T::iterator >::value_type
+     >::type result_type;
+     
+    result_type previous = std::numeric_limits< result_type >::max();
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    Rcpp::Vector< rtype< result_type >::value > vec(size);
+    
+    typename T::const_iterator i = val.begin();
+    typename T::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< result_type >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const result_type value = *i;
+        
+        if (na< typename traits::ctype< result_type >::type >::is_na(value)
+            || na< typename traits::ctype< result_type >::type >::is_na(
+                previous)) {
+            previous = na< result_type >::VALUE();
+        } else {
+            previous = std::min(previous, value);
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
+template< typename T >
+typename traits::enable_if<
+    hook< T >::value,
+    Rcpp::Vector<
+        rtype<
+            typename traits::ctype<
+                typename std::iterator_traits< typename T::iterator >::value_type
+             >::type
+        >::value
+    >
+>::type cummax(const T &val) {
+
+    typedef typename traits::ctype<
+        typename std::iterator_traits< typename T::iterator >::value_type
+     >::type result_type;
+     
+    result_type previous;
+    
+    if (std::numeric_limits< result_type >::is_integer) {
+        previous = std::numeric_limits< result_type >::min() + 1;
+    } else {
+        previous = -std::numeric_limits< result_type >::max();
+    }
+    
+    const dims_t dims = hooks::extract_dims(val);
+    uint64_t size = 0;
+    
+    if (dims.second == 0) {
+        size = dims.first;
+    } else {
+        size = dims.first * dims.second;
+    }
+    
+    Rcpp::Vector< rtype< result_type >::value > vec(size);
+    
+    typename T::const_iterator i = val.begin();
+    typename T::const_iterator iend = val.end();
+    typename Rcpp::Vector< rtype< result_type >::value >::iterator current
+        = vec.begin();
+    
+    for ( ; i != iend; ++i, ++current)
+    {
+        const result_type value = *i;
+        
+        if (na< typename traits::ctype< result_type >::type >::is_na(value)
+            || na< typename traits::ctype< result_type >::type >::is_na(
+                previous)) {
+            previous = na< result_type >::VALUE();
+        } else {
+            previous = std::max(previous, value);
+        }
+        
+        *current = previous;
+    }
+    
+    return vec;
+}
+
 
 } // namespace RcppHoney
