@@ -12,7 +12,7 @@
 
 <meta name="author" content="Daniel C. Dillon" />
 
-<meta name="date" content="2016-12-16" />
+<meta name="date" content="2017-11-18" />
 
 <title>Adding a Custom Function to RcppHoney</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Adding a Custom Function to RcppHoney</h1>
 <h4 class="author"><em>Daniel C. Dillon</em></h4>
-<h4 class="date"><em>2016-12-16</em></h4>
+<h4 class="date"><em>2017-11-18</em></h4>
 
 
 <div id="TOC">
@@ -97,62 +97,62 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Let Rcpp know we need RcppHoney</span>
 <span class="co">// [[Rcpp::depends(RcppHoney)]]</span>
 
-<span class="ot">#include &lt;RcppHoney.hpp&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;RcppHoney.hpp&gt;</span>
 
 <span class="dt">int</span> foo(<span class="dt">double</span> d) {
-    <span class="kw">if</span> (d &gt;= <span class="dv">0</span>) {
-        <span class="kw">return</span> <span class="dt">int</span>(d + <span class="fl">.5</span>);
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="dt">int</span>(d - <span class="fl">.5</span>);
+    <span class="cf">if</span> (d &gt;= <span class="dv">0</span>) {
+        <span class="cf">return</span> <span class="dt">int</span>(d + .<span class="dv">5</span>);
+    } <span class="cf">else</span> {
+        <span class="cf">return</span> <span class="dt">int</span>(d - .<span class="dv">5</span>);
     }
 }
 
-<span class="dt">int</span> bar(<span class="dt">int</span> x, <span class="dt">int</span> y) {<span class="kw">return</span> x + y;}
-<span class="dt">double</span> bar(<span class="dt">int</span> x, <span class="dt">double</span> y) {<span class="kw">return</span> x + y;}
-<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">int</span> y) {<span class="kw">return</span> x + y;}
-<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">double</span> y) {<span class="kw">return</span> x + y;}
+<span class="dt">int</span> bar(<span class="dt">int</span> x, <span class="dt">int</span> y) {<span class="cf">return</span> x + y;}
+<span class="dt">double</span> bar(<span class="dt">int</span> x, <span class="dt">double</span> y) {<span class="cf">return</span> x + y;}
+<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">int</span> y) {<span class="cf">return</span> x + y;}
+<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">double</span> y) {<span class="cf">return</span> x + y;}
 
 <span class="kw">namespace</span> RcppHoney {
 <span class="kw">namespace</span> functors {
 
 <span class="kw">template</span>&lt; <span class="kw">typename</span> Iterator, <span class="dt">bool</span> NA &gt;
 <span class="kw">struct</span> foo : <span class="kw">public</span> unary_result_dims {
-    <span class="kw">typedef</span> <span class="dt">int</span> return_type;
-    return_type <span class="kw">operator</span>()(Iterator &amp;rhs) <span class="dt">const</span> {
-        <span class="kw">if</span> (NA) {
-            <span class="kw">if</span> (na&lt; <span class="kw">typename</span> traits::ctype&lt;
-                    <span class="kw">typename</span> std::iterator_traits&lt; Iterator &gt;::value_type
+    <span class="kw">typedef</span> <span class="dt">int</span> <span class="dt">return_type</span>;
+    <span class="dt">return_type</span> <span class="kw">operator</span>()(Iterator &amp;rhs) <span class="at">const</span> {
+        <span class="cf">if</span> (NA) {
+            <span class="cf">if</span> (na&lt; <span class="kw">typename</span> traits::ctype&lt;
+                    <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; Iterator &gt;::<span class="dt">value_type</span>
                 &gt;::type &gt;::is_na(*rhs)) {
-                <span class="kw">return</span> na&lt; return_type &gt;::VALUE();
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> ::foo(*rhs);
+                <span class="cf">return</span> na&lt; <span class="dt">return_type</span> &gt;::VALUE();
+            } <span class="cf">else</span> {
+                <span class="cf">return</span> ::foo(*rhs);
             }
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> ::foo(*rhs);
+        } <span class="cf">else</span> {
+            <span class="cf">return</span> ::foo(*rhs);
         }
     }
 };
 
 <span class="kw">template</span>&lt; <span class="kw">typename</span> LhsIterator, <span class="kw">typename</span> RhsIterator, <span class="dt">bool</span> NA = <span class="kw">true</span> &gt;
 <span class="kw">struct</span> bar : <span class="kw">public</span> binary_result_dims {
-    <span class="kw">typedef</span> <span class="kw">typename</span> std::iterator_traits&lt; LhsIterator &gt;::value_type
-        lhs_value_type;
-    <span class="kw">typedef</span> <span class="kw">typename</span> std::iterator_traits&lt; RhsIterator &gt;::value_type
-        rhs_value_type;
-    <span class="kw">typedef</span> <span class="kw">typename</span> traits::widest_numeric_type&lt; lhs_value_type,
-        rhs_value_type &gt;::type return_type;
+    <span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; LhsIterator &gt;::<span class="dt">value_type</span>
+        <span class="dt">lhs_value_type</span>;
+    <span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; RhsIterator &gt;::<span class="dt">value_type</span>
+        <span class="dt">rhs_value_type</span>;
+    <span class="kw">typedef</span> <span class="kw">typename</span> traits::<span class="dt">widest_numeric_type</span>&lt; <span class="dt">lhs_value_type</span>,
+        <span class="dt">rhs_value_type</span> &gt;::type <span class="dt">return_type</span>;
 
-    <span class="kw">inline</span> return_type <span class="kw">operator</span>()(LhsIterator &amp;lhs, RhsIterator &amp;rhs) <span class="dt">const</span> {
-        <span class="kw">if</span> (NA) {
-            <span class="kw">if</span> (!na&lt; <span class="kw">typename</span> traits::ctype&lt; lhs_value_type &gt;::type
+    <span class="kw">inline</span> <span class="dt">return_type</span> <span class="kw">operator</span>()(LhsIterator &amp;lhs, RhsIterator &amp;rhs) <span class="at">const</span> {
+        <span class="cf">if</span> (NA) {
+            <span class="cf">if</span> (!na&lt; <span class="kw">typename</span> traits::ctype&lt; <span class="dt">lhs_value_type</span> &gt;::type
                 &gt;::is_na(*lhs) &amp;&amp; !na&lt; <span class="kw">typename</span> traits::ctype&lt;
-                    rhs_value_type &gt;::type &gt;::is_na(*rhs)) {
-                <span class="kw">return</span> ::bar(*lhs, *rhs);
+                    <span class="dt">rhs_value_type</span> &gt;::type &gt;::is_na(*rhs)) {
+                <span class="cf">return</span> ::bar(*lhs, *rhs);
             }
 
-            <span class="kw">return</span> na&lt; return_type &gt;::VALUE();
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> ::bar(*lhs, *rhs);
+            <span class="cf">return</span> na&lt; <span class="dt">return_type</span> &gt;::VALUE();
+        } <span class="cf">else</span> {
+            <span class="cf">return</span> ::bar(*lhs, *rhs);
         }
     }
 };
@@ -172,7 +172,7 @@ Rcpp::NumericVector example_custom_function(Rcpp::NumericVector v,
     Rcpp::NumericVector w) {
 
     RcppHoney::NumericVector retval = RcppHoney::foo(v) + RcppHoney::bar(v, w);
-    <span class="kw">return</span> retval;
+    <span class="cf">return</span> retval;
 }</code></pre></div>
 <p>Now it is time to understand what this all means.</p>
 </div>
@@ -188,36 +188,36 @@ Rcpp::NumericVector example_custom_function(Rcpp::NumericVector v,
 
 <span class="kw">template</span>&lt; <span class="kw">typename</span> Iterator, <span class="dt">bool</span> NA &gt;
 <span class="kw">struct</span> log : <span class="kw">public</span> binary_result_dims {
-    <span class="kw">typedef</span> <span class="dt">double</span> return_type;
-    return_type <span class="kw">operator</span>()(Iterator &amp;rhs) <span class="dt">const</span> {
-        <span class="kw">if</span> (NA) {
-            <span class="kw">if</span> (na&lt; <span class="kw">typename</span> traits::ctype&lt; <span class="kw">typename</span> std::iterator_traits&lt; Iterator &gt;::value_type &gt;::type &gt;::is_na(*rhs)) {
-                <span class="kw">return</span> na&lt; return_type &gt;::VALUE();
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> std::log(*rhs);
+    <span class="kw">typedef</span> <span class="dt">double</span> <span class="dt">return_type</span>;
+    <span class="dt">return_type</span> <span class="kw">operator</span>()(Iterator &amp;rhs) <span class="at">const</span> {
+        <span class="cf">if</span> (NA) {
+            <span class="cf">if</span> (na&lt; <span class="kw">typename</span> traits::ctype&lt; <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; Iterator &gt;::<span class="dt">value_type</span> &gt;::type &gt;::is_na(*rhs)) {
+                <span class="cf">return</span> na&lt; <span class="dt">return_type</span> &gt;::VALUE();
+            } <span class="cf">else</span> {
+                <span class="cf">return</span> <span class="bu">std::</span>log(*rhs);
             }
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> std::log(*rhs);
+        } <span class="cf">else</span> {
+            <span class="cf">return</span> <span class="bu">std::</span>log(*rhs);
         }
     }
 };
 
 <span class="kw">template</span>&lt; <span class="kw">typename</span> LhsIterator, <span class="kw">typename</span> RhsIterator, <span class="dt">bool</span> NA = <span class="kw">true</span> &gt;
 <span class="kw">struct</span> pow : <span class="kw">public</span> binary_result_dims {
-    <span class="kw">typedef</span> <span class="kw">typename</span> std::iterator_traits&lt; LhsIterator &gt;::value_type lhs_value_type;
-    <span class="kw">typedef</span> <span class="kw">typename</span> std::iterator_traits&lt; RhsIterator &gt;::value_type rhs_value_type;
-    <span class="kw">typedef</span> <span class="dt">double</span> return_type;
+    <span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; LhsIterator &gt;::<span class="dt">value_type</span> <span class="dt">lhs_value_type</span>;
+    <span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; RhsIterator &gt;::<span class="dt">value_type</span> <span class="dt">rhs_value_type</span>;
+    <span class="kw">typedef</span> <span class="dt">double</span> <span class="dt">return_type</span>;
 
-    <span class="kw">inline</span> return_type <span class="kw">operator</span>()(LhsIterator &amp;lhs, RhsIterator &amp;rhs) <span class="dt">const</span> {
-        <span class="kw">if</span> (NA) {
-            <span class="kw">if</span> (!na&lt; <span class="kw">typename</span> traits::ctype&lt; lhs_value_type &gt;::type &gt;::is_na(*lhs)
-                &amp;&amp; !na&lt; <span class="kw">typename</span> traits::ctype&lt; rhs_value_type &gt;::type &gt;::is_na(*rhs)) {
-                <span class="kw">return</span> std::pow(*lhs, *rhs);
+    <span class="kw">inline</span> <span class="dt">return_type</span> <span class="kw">operator</span>()(LhsIterator &amp;lhs, RhsIterator &amp;rhs) <span class="at">const</span> {
+        <span class="cf">if</span> (NA) {
+            <span class="cf">if</span> (!na&lt; <span class="kw">typename</span> traits::ctype&lt; <span class="dt">lhs_value_type</span> &gt;::type &gt;::is_na(*lhs)
+                &amp;&amp; !na&lt; <span class="kw">typename</span> traits::ctype&lt; <span class="dt">rhs_value_type</span> &gt;::type &gt;::is_na(*rhs)) {
+                <span class="cf">return</span> <span class="bu">std::</span>pow(*lhs, *rhs);
             }
 
-            <span class="kw">return</span> na&lt; return_type &gt;::VALUE();
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> std::pow(*lhs, *rhs);
+            <span class="cf">return</span> na&lt; <span class="dt">return_type</span> &gt;::VALUE();
+        } <span class="cf">else</span> {
+            <span class="cf">return</span> <span class="bu">std::</span>pow(*lhs, *rhs);
         }
     }
 };
@@ -238,21 +238,21 @@ Rcpp::NumericVector example_custom_function(Rcpp::NumericVector v,
 <p>For unary functions like <code>log</code> the function signatures that need to be created are as follows (in pseudoish code):</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> RcppHoney {
 
-operand&lt; ... &gt; log(<span class="dt">const</span> operand&lt; ... &gt; &amp;);
-operand&lt; ... &gt; log(<span class="dt">const</span> hooked_type &amp;);
+operand&lt; ... &gt; log(<span class="at">const</span> operand&lt; ... &gt; &amp;);
+operand&lt; ... &gt; log(<span class="at">const</span> <span class="dt">hooked_type</span> &amp;);
 
 } <span class="co">// namespace</span></code></pre></div>
 <p>For binary functions like <code>pow</code> the function signatures that need to be created are:</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> RcppHoney {
 
-operand&lt; ... &gt; pow(<span class="dt">const</span> operand&lt; ... &gt; &amp;, <span class="dt">const</span> operand&lt; ... &gt; &amp;);
-operand&lt; ... &gt; pow(<span class="dt">const</span> scalar &amp;, <span class="dt">const</span> operand&lt; ... &gt; &amp;);
-operand&lt; ... &gt; pow(<span class="dt">const</span> operand&lt; ... &gt; &amp;, <span class="dt">const</span> scalar &amp;);
-operand&lt; ... &gt; pow(<span class="dt">const</span> scalar &amp;, <span class="dt">const</span> hooked_type &amp;);
-operand&lt; ... &gt; pow(<span class="dt">const</span> hooked_type &amp;, <span class="dt">const</span> scalar &amp;);
-operand&lt; ... &gt; pow(<span class="dt">const</span> operand&lt; ... &gt; &amp;, <span class="dt">const</span> hooked_type &amp;);
-operand&lt; ... &gt; pow(<span class="dt">const</span> hooked_type &amp;, <span class="dt">const</span> operand&lt; ... &gt; &amp;);
-operand&lt; ... &gt; pow(<span class="dt">const</span> hooked_type &amp;, <span class="dt">const</span> hooked_type &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> operand&lt; ... &gt; &amp;, <span class="at">const</span> operand&lt; ... &gt; &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> scalar &amp;, <span class="at">const</span> operand&lt; ... &gt; &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> operand&lt; ... &gt; &amp;, <span class="at">const</span> scalar &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> scalar &amp;, <span class="at">const</span> <span class="dt">hooked_type</span> &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> <span class="dt">hooked_type</span> &amp;, <span class="at">const</span> scalar &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> operand&lt; ... &gt; &amp;, <span class="at">const</span> <span class="dt">hooked_type</span> &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> <span class="dt">hooked_type</span> &amp;, <span class="at">const</span> operand&lt; ... &gt; &amp;);
+operand&lt; ... &gt; pow(<span class="at">const</span> <span class="dt">hooked_type</span> &amp;, <span class="at">const</span> <span class="dt">hooked_type</span> &amp;);
 
 } <span class="co">// namespace RcppHoney</span></code></pre></div>
 <p>Fortunately, <code>RcppHoney</code> provides macros to define these for us.</p>
@@ -269,17 +269,17 @@ RCPP_HONEY_GENERATE_BINARY_FUNCTION(pow, pow)</code></pre></div>
 <h4>The Functions</h4>
 <p>First we have the functions that we wish to use with <code>RcppHoney</code> objects (and hooked objects). These functions are fairly representative of the types of functions that we might want to leverage inside <code>RcppHoney</code> expressions. There is a third class of function which we might want to add which is the truly templated function. This is, in essence, a more general case of the <code>bar</code> example and is left as an exercise for the reader.</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> foo(<span class="dt">double</span> d) {
-    <span class="kw">if</span> (d &gt;= <span class="dv">0</span>) {
-        <span class="kw">return</span> <span class="dt">int</span>(d + <span class="fl">.5</span>);
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="dt">int</span>(d - <span class="fl">.5</span>);
+    <span class="cf">if</span> (d &gt;= <span class="dv">0</span>) {
+        <span class="cf">return</span> <span class="dt">int</span>(d + .<span class="dv">5</span>);
+    } <span class="cf">else</span> {
+        <span class="cf">return</span> <span class="dt">int</span>(d - .<span class="dv">5</span>);
     }
 }
 
-<span class="dt">int</span> bar(<span class="dt">int</span> x, <span class="dt">int</span> y) {<span class="kw">return</span> x + y;}
-<span class="dt">double</span> bar(<span class="dt">int</span> x, <span class="dt">double</span> y) {<span class="kw">return</span> x + y;}
-<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">int</span> y) {<span class="kw">return</span> x + y;}
-<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">double</span> y) {<span class="kw">return</span> x + y;}</code></pre></div>
+<span class="dt">int</span> bar(<span class="dt">int</span> x, <span class="dt">int</span> y) {<span class="cf">return</span> x + y;}
+<span class="dt">double</span> bar(<span class="dt">int</span> x, <span class="dt">double</span> y) {<span class="cf">return</span> x + y;}
+<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">int</span> y) {<span class="cf">return</span> x + y;}
+<span class="dt">double</span> bar(<span class="dt">double</span> x, <span class="dt">double</span> y) {<span class="cf">return</span> x + y;}</code></pre></div>
 </div>
 <div id="the-function-objects" class="section level4">
 <h4>The Function Objects</h4>
@@ -289,42 +289,42 @@ RCPP_HONEY_GENERATE_BINARY_FUNCTION(pow, pow)</code></pre></div>
 
 <span class="kw">template</span>&lt; <span class="kw">typename</span> Iterator, <span class="dt">bool</span> NA &gt;
 <span class="kw">struct</span> foo {
-    <span class="kw">typedef</span> <span class="dt">int</span> return_type;
-    return_type <span class="kw">operator</span>()(Iterator &amp;rhs) <span class="dt">const</span> {
-        <span class="kw">if</span> (NA) {
-            <span class="kw">if</span> (na&lt; <span class="kw">typename</span> traits::ctype&lt;
-                    <span class="kw">typename</span> std::iterator_traits&lt; Iterator &gt;::value_type
+    <span class="kw">typedef</span> <span class="dt">int</span> <span class="dt">return_type</span>;
+    <span class="dt">return_type</span> <span class="kw">operator</span>()(Iterator &amp;rhs) <span class="at">const</span> {
+        <span class="cf">if</span> (NA) {
+            <span class="cf">if</span> (na&lt; <span class="kw">typename</span> traits::ctype&lt;
+                    <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; Iterator &gt;::<span class="dt">value_type</span>
                 &gt;::type &gt;::is_na(*rhs)) {
-                <span class="kw">return</span> na&lt; return_type &gt;::VALUE();
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> ::foo(*rhs);
+                <span class="cf">return</span> na&lt; <span class="dt">return_type</span> &gt;::VALUE();
+            } <span class="cf">else</span> {
+                <span class="cf">return</span> ::foo(*rhs);
             }
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> ::foo(*rhs);
+        } <span class="cf">else</span> {
+            <span class="cf">return</span> ::foo(*rhs);
         }
     }
 };
 
 <span class="kw">template</span>&lt; <span class="kw">typename</span> LhsIterator, <span class="kw">typename</span> RhsIterator, <span class="dt">bool</span> NA = <span class="kw">true</span> &gt;
 <span class="kw">struct</span> bar {
-    <span class="kw">typedef</span> <span class="kw">typename</span> std::iterator_traits&lt; LhsIterator &gt;::value_type
-        lhs_value_type;
-    <span class="kw">typedef</span> <span class="kw">typename</span> std::iterator_traits&lt; RhsIterator &gt;::value_type
-        rhs_value_type;
-    <span class="kw">typedef</span> <span class="kw">typename</span> traits::widest_numeric_type&lt; lhs_value_type,
-        rhs_value_type &gt;::type return_type;
+    <span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; LhsIterator &gt;::<span class="dt">value_type</span>
+        <span class="dt">lhs_value_type</span>;
+    <span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>iterator_traits&lt; RhsIterator &gt;::<span class="dt">value_type</span>
+        <span class="dt">rhs_value_type</span>;
+    <span class="kw">typedef</span> <span class="kw">typename</span> traits::<span class="dt">widest_numeric_type</span>&lt; <span class="dt">lhs_value_type</span>,
+        <span class="dt">rhs_value_type</span> &gt;::type <span class="dt">return_type</span>;
 
-    <span class="kw">inline</span> return_type <span class="kw">operator</span>()(LhsIterator &amp;lhs, RhsIterator &amp;rhs) <span class="dt">const</span> {
-        <span class="kw">if</span> (NA) {
-            <span class="kw">if</span> (!na&lt; <span class="kw">typename</span> traits::ctype&lt; lhs_value_type &gt;::type
+    <span class="kw">inline</span> <span class="dt">return_type</span> <span class="kw">operator</span>()(LhsIterator &amp;lhs, RhsIterator &amp;rhs) <span class="at">const</span> {
+        <span class="cf">if</span> (NA) {
+            <span class="cf">if</span> (!na&lt; <span class="kw">typename</span> traits::ctype&lt; <span class="dt">lhs_value_type</span> &gt;::type
                 &gt;::is_na(*lhs) &amp;&amp; !na&lt; <span class="kw">typename</span> traits::ctype&lt;
-                    rhs_value_type &gt;::type &gt;::is_na(*rhs)) {
-                <span class="kw">return</span> ::bar(*lhs, *rhs);
+                    <span class="dt">rhs_value_type</span> &gt;::type &gt;::is_na(*rhs)) {
+                <span class="cf">return</span> ::bar(*lhs, *rhs);
             }
 
-            <span class="kw">return</span> na&lt; return_type &gt;::VALUE();
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> ::bar(*lhs, *rhs);
+            <span class="cf">return</span> na&lt; <span class="dt">return_type</span> &gt;::VALUE();
+        } <span class="cf">else</span> {
+            <span class="cf">return</span> ::bar(*lhs, *rhs);
         }
     }
 };

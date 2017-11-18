@@ -12,7 +12,7 @@
 
 <meta name="author" content="Daniel C. Dillon" />
 
-<meta name="date" content="2016-12-16" />
+<meta name="date" content="2017-11-18" />
 
 <title>RcppHoney Introduction</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">RcppHoney Introduction</h1>
 <h4 class="author"><em>Daniel C. Dillon</em></h4>
-<h4 class="date"><em>2016-12-16</em></h4>
+<h4 class="date"><em>2017-11-18</em></h4>
 
 
 <div id="TOC">
@@ -106,11 +106,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <span class="co">// we have to do this because we're going to hook in a non-default structure</span>
 <span class="co">// otherwise we'd just #include &lt;RcppHoney.hpp&gt;</span>
-<span class="ot">#include &lt;RcppCommon.h&gt;</span>
-<span class="ot">#include &lt;RcppHoneyForward.hpp&gt; </span>
+<span class="pp">#include </span><span class="im">&lt;RcppCommon.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;RcppHoneyForward.hpp&gt;</span><span class="pp"> </span>
 
 <span class="co">// We're going to use the std::list class later so include it now</span>
-<span class="ot">#include &lt;list&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;list&gt;</span>
 
 <span class="co">// We have to declare our hooks before we include RcppHoney.hpp</span>
 <span class="kw">namespace</span> RcppHoney {
@@ -118,21 +118,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <span class="co">// Hook in all std::list types (could be more specific)</span>
 <span class="kw">template</span>&lt; <span class="kw">typename</span> T, <span class="kw">typename</span> A &gt;
-traits::true_type is_hooked(<span class="dt">const</span> std::list&lt; T, A &gt; &amp;val);
+traits::<span class="dt">true_type</span> is_hooked(<span class="at">const</span> <span class="bu">std::</span>list&lt; T, A &gt; &amp;val);
 
 <span class="co">// Tell RcppHoney that NA has meaning in std::list</span>
 <span class="kw">template</span>&lt; <span class="kw">typename</span> T, <span class="kw">typename</span> A &gt;
-traits::true_type has_na(<span class="dt">const</span> std::list&lt; T, A &gt; &amp;val);
+traits::<span class="dt">true_type</span> has_na(<span class="at">const</span> <span class="bu">std::</span>list&lt; T, A &gt; &amp;val);
 
 <span class="co">// Tell RcppHoney that it needs to create basic (e.g. std::list + std::list)</span>
 <span class="co">// operators</span>
 <span class="kw">template</span>&lt; <span class="kw">typename</span> T, <span class="kw">typename</span> A &gt;
-traits::true_type needs_basic_operators(<span class="dt">const</span> std::list&lt; T, A &gt; &amp;val);
+traits::<span class="dt">true_type</span> needs_basic_operators(<span class="at">const</span> <span class="bu">std::</span>list&lt; T, A &gt; &amp;val);
 
 <span class="co">// Tell RcppHoney that it needs to create scalar (e.g. std::list + int/double)</span>
 <span class="co">// operators</span>
 <span class="kw">template</span>&lt; <span class="kw">typename</span> T, <span class="kw">typename</span> A &gt;
-traits::true_type needs_scalar_operators(<span class="dt">const</span> std::list&lt; T, A &gt; &amp;val);
+traits::<span class="dt">true_type</span> needs_scalar_operators(<span class="at">const</span> <span class="bu">std::</span>list&lt; T, A &gt; &amp;val);
 
 <span class="co">// Tell RcppHoney that this set of types is part of the FAMILY_USER + 1 family.</span>
 <span class="co">// This is used in conjunction with needs_basic_operators.  If you have</span>
@@ -140,23 +140,23 @@ traits::true_type needs_scalar_operators(<span class="dt">const</span> std::list
 <span class="co">// that are not part of the same family will have binary operators created</span>
 <span class="co">// between them.</span>
 <span class="kw">template</span>&lt; <span class="kw">typename</span> T, <span class="kw">typename</span> A &gt;
-traits::int_constant&lt; FAMILY_USER + <span class="dv">1</span> &gt; family(<span class="dt">const</span> std::list&lt; T, A &gt; &amp;val);
+traits::int_constant&lt; FAMILY_USER + <span class="dv">1</span> &gt; family(<span class="at">const</span> <span class="bu">std::</span>list&lt; T, A &gt; &amp;val);
 
 } <span class="co">// namespace hooks</span>
 } <span class="co">// namespace RcppHoney</span>
 
-<span class="ot">#include &lt;RcppHoney.hpp&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;RcppHoney.hpp&gt;</span>
 
 <span class="co">// [[Rcpp::export]]</span>
 Rcpp::NumericVector example_manually_hooked() {
 
     <span class="co">// We manually hooked std::list in to RcppHoney so we'll create one</span>
-    std::list&lt; <span class="dt">int</span> &gt; l;
+    <span class="bu">std::</span>list&lt; <span class="dt">int</span> &gt; l;
     l.push_back(<span class="dv">1</span>); l.push_back(<span class="dv">2</span>); l.push_back(<span class="dv">3</span>); l.push_back(<span class="dv">4</span>); l.push_back(<span class="dv">5</span>);
 
     <span class="co">// std::vector is already hooked in to RcppHoney in default_hooks.hpp so</span>
     <span class="co">// we'll create one of those too</span>
-    std::vector&lt; <span class="dt">int</span> &gt; v(l.begin(), l.end());
+    <span class="bu">std::</span>vector&lt; <span class="dt">int</span> &gt; v(l.begin(), l.end());
 
     <span class="co">// And for good measure, let's create an Rcpp::NumericVector which is</span>
     <span class="co">// also hooked by default</span>
@@ -180,7 +180,7 @@ Rcpp::NumericVector example_manually_hooked() {
     RcppHoney::NumericVector retval
         =  <span class="dv">42</span> + l + v + RcppHoney::log(v) - v - l + RcppHoney::sqrt(v) + -v2
             + <span class="dv">42</span>;
-    <span class="kw">return</span> retval;
+    <span class="cf">return</span> retval;
 }</code></pre></div>
 </div>
 <div id="conclusion" class="section level2">
